@@ -1,0 +1,3 @@
+# Module climateapp
+# RPC service class, partial path of RPC policy file
+se.climateapp.client.GreetingService, E83D01362B6FB247F7E9F0E36AB28D1A.gwt.rpc
