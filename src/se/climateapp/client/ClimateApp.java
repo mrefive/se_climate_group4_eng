@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -20,16 +21,17 @@ import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FlexTable;
 
 import se.climateapp.shared.TemperatureMeasurement;
-
-import com.google.gwt.user.client.ui.FlexTable;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ClimateApp implements EntryPoint {
-	private FlexTable climateFlexTable = new FlexTable();
+	private UIDataTable uiDataTable = new UIDataTable();
 	private Label tempInfoLabel = new Label("Test");
 	/**
 	 * The message displayed to the user when the server cannot be reached or
@@ -45,16 +47,8 @@ public class ClimateApp implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
 
 	private void initializeTheTable() {
-		// Create table for stock data.
-		climateFlexTable.setText(0, 0, "Testing");
-		climateFlexTable.setText(0, 1, "Column1");
-		climateFlexTable.setText(0, 2, "Column2");
-		climateFlexTable.setText(0, 3, "Column3");
-		HTMLTable.RowFormatter rf = climateFlexTable.getRowFormatter();
-		rf.addStyleName(0, "FlexTable-HeaderRow");
-		
-		// Associate the table with the HTML host page.
-		RootPanel.get("climateTable").add(climateFlexTable);
+		Widget table = uiDataTable.initialize();
+		RootPanel.get("climateTable").add(table);
 	}
 
 	/**
@@ -147,42 +141,16 @@ public class ClimateApp implements EntryPoint {
 
 			public void onSuccess(ArrayList<TemperatureMeasurement> result) {
 				System.out.println("Success");
-				fillTable(result);
+				fillTable2(result);
 			}
 
 		});
 	}
 
-	private void fillTable(ArrayList<TemperatureMeasurement> data) {
-		if (data == null)
-			return;
-		while (climateFlexTable.getRowCount() > data.size()+1) {
-			climateFlexTable.removeRow(climateFlexTable.getRowCount()-1);
-		}
-
-		climateFlexTable.setText(0, 0, "Date");
-		climateFlexTable.setText(0, 1, "Avg. Temperature");
-		climateFlexTable.setText(0, 2, "Avg. Uncertainty");
-		climateFlexTable.setText(0, 3, "Country");
-		climateFlexTable.setText(0, 4, "City");
-		climateFlexTable.setText(0, 5, "Latitude");
-		climateFlexTable.setText(0, 6, "Longitude");
-		
-		DateTimeFormat df = DateTimeFormat.getFormat("yyyy-mm-dd");
-
-		for(int i = 0; i < Math.min(100,data.size()); i++) {
-			TemperatureMeasurement meas = data.get(i);
-
-			Date date = meas.getFieldDate();
-			climateFlexTable.setText(i+1, 0, df.format(date));
-			climateFlexTable.setText(i+1, 1, String.valueOf(meas.getFieldAverageTemperature()));
-			climateFlexTable.setText(i+1, 2, String.valueOf(meas.getFieldAverageTemperatureUncertainty()));
-			climateFlexTable.setText(i+1, 3, meas.getFieldCountry());
-			climateFlexTable.setText(i+1, 4, meas.getFieldCity());
-			climateFlexTable.setText(i+1, 5, meas.getFieldLatitude());
-			climateFlexTable.setText(i+1, 6, meas.getFieldLongitude());
-		}
-		tempInfoLabel.setText("Table: " + climateFlexTable.getRowCount() + " ;  Data: " + data.size());
-	
+	private void fillTable2(ArrayList<TemperatureMeasurement> data) {
+		uiDataTable.updateTable(data);
+		//tempInfoLabel.setText("Table: " + uiDataTable.getRowCount() + " ;  Data: " + data.size());
+		tempInfoLabel.setText(data.size() + "  data records");
 	}
+
 }

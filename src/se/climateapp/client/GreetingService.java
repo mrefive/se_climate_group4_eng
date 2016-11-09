@@ -13,4 +13,5 @@ import se.climateapp.shared.TemperatureMeasurement;
 @RemoteServiceRelativePath("greet")
 public interface GreetingService extends RemoteService {
 	ArrayList<TemperatureMeasurement> getMeasurements();
+	ArrayList<TemperatureMeasurement> getMeasurements(int start, int length);
 }

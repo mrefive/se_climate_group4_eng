@@ -11,4 +11,5 @@ import se.climateapp.shared.TemperatureMeasurement;
  */
 public interface GreetingServiceAsync {
 	void getMeasurements(AsyncCallback<ArrayList<TemperatureMeasurement>> callback);
+	void getMeasurements(int start, int length, AsyncCallback<ArrayList<TemperatureMeasurement>> callback);
 }

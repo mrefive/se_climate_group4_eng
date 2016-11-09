@@ -1,2 +1,0 @@
-serviceClass: se.climateapp.client.GreetingService
-path: E83D01362B6FB247F7E9F0E36AB28D1A.gwt.rpc

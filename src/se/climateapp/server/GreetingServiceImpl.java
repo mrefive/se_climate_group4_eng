@@ -1,8 +1,5 @@
 package se.climateapp.server;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -25,62 +22,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 
 	public GreetingServiceImpl() {
-		//addTestMeasurements();
+
 	}
-
-	
-	public void addTestMeasurements() {
-		TemperatureMeasurement meas;
-		DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-
-		meas = new TemperatureMeasurement();
-		try {
-			meas.setFieldDate(df.parse("1856-03-01"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		meas.setFieldAverageTemperature(Double.parseDouble("27.297"));
-		meas.setFieldAverageTemperatureUncertainty(Double.parseDouble("27.297"));		
-		meas.setFieldCity("Abidjan");
-		meas.setFieldCountry("Côte D'Ivoire");
-		meas.setFieldLatitude("5.63N");
-		meas.setFieldLongitude("3.23W");
-		addMeasurement(meas);
-		try {
-			meas.setFieldDate(df.parse("1857-03-01"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		meas.setFieldAverageTemperature(Double.parseDouble("26.297"));
-		addMeasurement(meas);
-		try {
-			meas.setFieldDate(df.parse("1858-03-01"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		meas.setFieldAverageTemperature(Double.parseDouble("26.89"));
-		addMeasurement(meas);
-		try {
-			meas.setFieldDate(df.parse("1859-03-01"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		meas.setFieldAverageTemperature(Double.parseDouble("22.277"));
-		addMeasurement(meas);
-		try {
-			meas.setFieldDate(df.parse("1860-03-01"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		meas.setFieldAverageTemperature(Double.parseDouble("19.297"));
-		addMeasurement(meas);
-	}
-
 
 	public ArrayList<TemperatureMeasurement> getMeasurements() {
 		ArrayList<TemperatureMeasurement> measurementlist = new ArrayList<TemperatureMeasurement>();
@@ -89,10 +32,10 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 			// Use class Query to assemble a query
 			Query q = new Query("TptMeas");
-
+			
 			// Use PreparedQuery interface to retrieve results
 			PreparedQuery pq = datastore.prepare(q);
-
+			
 			for (Entity entity : pq.asIterable()) {
 				TemperatureMeasurement measurement = new TemperatureMeasurement();		
 				measurement.setFieldDate((Date) entity.getProperty("fd"));
@@ -124,10 +67,16 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			entity.setProperty("Country", meas.getFieldCountry());
 			entity.setProperty("Lat", meas.getFieldLatitude());
 			entity.setProperty("Long", meas.getFieldLongitude());
-
 			datastore.put(entity);
+			
 		} catch (Exception e) {
 			throw new InvocationException("Exeption connecting to the database", e);
 		}
+	}
+
+	@Override
+	public ArrayList<TemperatureMeasurement> getMeasurements(int start, int length) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
