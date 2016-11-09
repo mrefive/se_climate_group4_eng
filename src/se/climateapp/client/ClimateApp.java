@@ -1,6 +1,7 @@
 package se.climateapp.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -9,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -17,7 +19,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import se.climateapp.shared.TemperatureMeasurement;
@@ -29,7 +30,7 @@ import com.google.gwt.user.client.ui.FlexTable;
  */
 public class ClimateApp implements EntryPoint {
 	private FlexTable climateFlexTable = new FlexTable();
-
+	private Label tempInfoLabel = new Label("Test");
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -61,8 +62,11 @@ public class ClimateApp implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		initializeTheTable();
-
+		FileUploadForm uploadform = new FileUploadForm();
+		RootPanel.get("gwtCSVUpload").add(uploadform.initialize());
+		
 		final Button sendButton = new Button("Populate Table");
+
 		//final TextBox nameField = new TextBox();
 		//nameField.setText("GWT User");
 		final Label errorLabel = new Label();
@@ -75,6 +79,7 @@ public class ClimateApp implements EntryPoint {
 		//RootPanel.get("nameFieldContainer").add(nameField);
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
+		RootPanel.get("labelInfoStuff").add(tempInfoLabel);
 
 		// Focus the cursor on the name field when the app loads
 		//nameField.setFocus(true);
@@ -151,25 +156,33 @@ public class ClimateApp implements EntryPoint {
 	private void fillTable(ArrayList<TemperatureMeasurement> data) {
 		if (data == null)
 			return;
+		while (climateFlexTable.getRowCount() > data.size()+1) {
+			climateFlexTable.removeRow(climateFlexTable.getRowCount()-1);
+		}
 
 		climateFlexTable.setText(0, 0, "Date");
 		climateFlexTable.setText(0, 1, "Avg. Temperature");
 		climateFlexTable.setText(0, 2, "Avg. Uncertainty");
-		climateFlexTable.setText(0, 3, "City");
-		climateFlexTable.setText(0, 4, "Country");
+		climateFlexTable.setText(0, 3, "Country");
+		climateFlexTable.setText(0, 4, "City");
 		climateFlexTable.setText(0, 5, "Latitude");
 		climateFlexTable.setText(0, 6, "Longitude");
 		
-		for(int i = 0; i < data.size(); i++) {
+		DateTimeFormat df = DateTimeFormat.getFormat("yyyy-mm-dd");
+
+		for(int i = 0; i < Math.min(100,data.size()); i++) {
 			TemperatureMeasurement meas = data.get(i);
-			climateFlexTable.setText(i+1, 0, meas.getFieldDate().toString());
+
+			Date date = meas.getFieldDate();
+			climateFlexTable.setText(i+1, 0, df.format(date));
 			climateFlexTable.setText(i+1, 1, String.valueOf(meas.getFieldAverageTemperature()));
 			climateFlexTable.setText(i+1, 2, String.valueOf(meas.getFieldAverageTemperatureUncertainty()));
-			climateFlexTable.setText(i+1, 3, meas.getFieldCity());
-			climateFlexTable.setText(i+1, 4, meas.getFieldCountry());
+			climateFlexTable.setText(i+1, 3, meas.getFieldCountry());
+			climateFlexTable.setText(i+1, 4, meas.getFieldCity());
 			climateFlexTable.setText(i+1, 5, meas.getFieldLatitude());
 			climateFlexTable.setText(i+1, 6, meas.getFieldLongitude());
-			i++;
 		}
+		tempInfoLabel.setText("Table: " + climateFlexTable.getRowCount() + " ;  Data: " + data.size());
+	
 	}
 }

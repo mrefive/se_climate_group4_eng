@@ -3,9 +3,6 @@ package se.climateapp.shared;
 import java.io.Serializable;
 import java.util.Date;
 
-//import com.google.gwt.i18n.client.NumberFormat;
-
-//import com.google.gwt.i18n.shared.DateTimeFormat;
 
 public class TemperatureMeasurement implements Serializable {
 	/**
@@ -13,8 +10,6 @@ public class TemperatureMeasurement implements Serializable {
 	 */
 	private static final long serialVersionUID = 4657652688518865427L;
 
-	//private static DateTimeFormat df = DateTimeFormat.getFormat("YYYY-MM-DD");
-	
 	private Date fieldDate; 
 	private double fieldAverageTemperature;
 	private double fieldAverageTemperatureUncertainty;
@@ -32,10 +27,6 @@ public class TemperatureMeasurement implements Serializable {
 	}
 	public void setFieldDate(Date fieldDate) {
 		this.fieldDate = fieldDate;
-	}
-	public void setFieldDate(String fieldDate) {
-	//		Date parsedDate = df.parse(fieldDate); 
-	//		this.fieldDate = parsedDate;
 	}
 	public double getFieldAverageTemperature() {
 		return fieldAverageTemperature;

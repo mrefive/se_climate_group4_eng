@@ -1,24 +1,19 @@
 package se.climateapp.server;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import se.climateapp.client.GreetingService;
 import se.climateapp.shared.TemperatureMeasurement;
-import se.climateapp.shared.TemperatureMeasurementSet;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.utils.SystemProperty;
 import com.google.gwt.user.client.rpc.InvocationException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -29,80 +24,22 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 
-	private ArrayList<String> executeQuery(String query) {
-		ArrayList<String> queryResult = new ArrayList<String>();
-
-		Connection connection = null;
-		ResultSet resultSet = null;
-		ResultSetMetaData rsmd = null;
-		Statement statement = null;
-		String url;
-		String classForName;
-		String instanceName = "ISNTANCEMNAME";
-		String databaseName = "?DBNAME?";
-		String projectID = "climateapp-148823";
-
-		if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Production) {
-			// Load the class that provides the new "jdbc:google:mysql://"
-			// prefix.
-			classForName = "com.mysql.jdbc.GoogleDriver";
-			url = "jdbc:google:mysql://" + projectID + ":" + instanceName + "/" + databaseName + "?user=root";
-		} else {
-			// Local MySQL instance to use during development.
-			classForName = "com.mysql.jdbc.Driver";
-			url = "jdbc:mysql://127.0.0.1:3306/" + databaseName + "?user=root";
-		}
-
-		try {
-			Class.forName(classForName);
-			connection = DriverManager.getConnection(url);
-
-			if (connection != null) {
-				statement = connection.createStatement();
-			}
-
-			if (statement != null) {
-				resultSet = statement.executeQuery(query);
-			}
-
-			rsmd = resultSet.getMetaData();
-
-			queryResult.add(rsmd.getColumnCount() + "");
-
-			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-				queryResult.add(rsmd.getColumnName(i));
-			}
-
-			while (resultSet.next()) {
-				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-					queryResult.add(resultSet.getString(i));
-				}
-
-			}
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (SQLException e) {
-		}
-
-		return queryResult;
-	}
-
-	public ArrayList<String> getTableData() {
-		String tableName = "movies1";
-		return executeQuery("SELECT name, length, language, origin FROM " + tableName + " WHERE year=2000");
-	}
-
 	public GreetingServiceImpl() {
-		addTestMeasurements();
+		//addTestMeasurements();
 	}
-	
-	private static DateTimeFormat df = DateTimeFormat.getFormat("YYYY-MM-DD");
+
 	
 	public void addTestMeasurements() {
 		TemperatureMeasurement meas;
-		
+		DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+
 		meas = new TemperatureMeasurement();
-		meas.setFieldDate("1856-03-01");
+		try {
+			meas.setFieldDate(df.parse("1856-03-01"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		meas.setFieldAverageTemperature(Double.parseDouble("27.297"));
 		meas.setFieldAverageTemperatureUncertainty(Double.parseDouble("27.297"));		
 		meas.setFieldCity("Abidjan");
@@ -110,16 +47,36 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		meas.setFieldLatitude("5.63N");
 		meas.setFieldLongitude("3.23W");
 		addMeasurement(meas);
-		meas.setFieldDate("1857-03-01");
+		try {
+			meas.setFieldDate(df.parse("1857-03-01"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		meas.setFieldAverageTemperature(Double.parseDouble("26.297"));
 		addMeasurement(meas);
-		meas.setFieldDate("1858-03-01");
+		try {
+			meas.setFieldDate(df.parse("1858-03-01"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		meas.setFieldAverageTemperature(Double.parseDouble("26.89"));
 		addMeasurement(meas);
-		meas.setFieldDate("1859-03-01");
+		try {
+			meas.setFieldDate(df.parse("1859-03-01"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		meas.setFieldAverageTemperature(Double.parseDouble("22.277"));
 		addMeasurement(meas);
-		meas.setFieldDate("1860-03-01");
+		try {
+			meas.setFieldDate(df.parse("1860-03-01"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		meas.setFieldAverageTemperature(Double.parseDouble("19.297"));
 		addMeasurement(meas);
 	}
@@ -138,13 +95,11 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
 			for (Entity entity : pq.asIterable()) {
 				TemperatureMeasurement measurement = new TemperatureMeasurement();		
-				//measurement.setFieldDate((String) entity.getProperty("fd"));
+				measurement.setFieldDate((Date) entity.getProperty("fd"));
 				measurement.setFieldAverageTemperature((Double) entity.getProperty("avgTmp"));
 				measurement.setFieldAverageTemperatureUncertainty((Double) entity.getProperty("avgTmpUn"));
 				measurement.setFieldCity((String) entity.getProperty("City"));
 				measurement.setFieldCountry((String) entity.getProperty("Country"));
-				
-				System.out.println("Country: " + entity.getProperty("Country"));
 				measurement.setFieldLatitude((String) entity.getProperty("Lat"));
 				measurement.setFieldLongitude((String) entity.getProperty("Long"));
 				
@@ -153,9 +108,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 		} catch (Exception e) {
 			throw new InvocationException("Exception connecting to the database", e);
 		}
-
-		System.out.println("received " + measurementlist.size());
-
+		
 		return measurementlist;
 	}
 
@@ -164,7 +117,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 			
 			Entity entity = new Entity("TptMeas");
-			//entity.setProperty("fd", meas.getFieldDate());
+			entity.setProperty("fd", meas.getFieldDate());
 			entity.setProperty("avgTmp", meas.getFieldAverageTemperature());
 			entity.setProperty("avgTmpUn", meas.getFieldAverageTemperatureUncertainty());
 			entity.setProperty("City", meas.getFieldCity());

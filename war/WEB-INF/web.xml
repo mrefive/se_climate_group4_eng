@@ -6,6 +6,15 @@
          xmlns="http://java.sun.com/xml/ns/javaee">
 
   <!-- Servlets -->
+  	<servlet>
+		<servlet-name>fileUploadServlet</servlet-name>
+		<servlet-class>se.climateapp.server.CSVFileLoad</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>fileUploadServlet</servlet-name>
+		<url-pattern>/climateapp/fileupload</url-pattern>
+	</servlet-mapping>
+	
   <servlet>
     <servlet-name>greetServlet</servlet-name>
     <servlet-class>se.climateapp.server.GreetingServiceImpl</servlet-class>
