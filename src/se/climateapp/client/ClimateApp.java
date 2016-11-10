@@ -1,8 +1,5 @@
 package se.climateapp.client;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -10,22 +7,17 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FlexTable;
 
-import se.climateapp.shared.TemperatureMeasurement;
+import se.climateapp.shared.MeasurementsQueryResult;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -47,6 +39,7 @@ public class ClimateApp implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
 
 	private void initializeTheTable() {
+		uiDataTable.remoteService = greetingService;
 		Widget table = uiDataTable.initialize();
 		RootPanel.get("climateTable").add(table);
 	}
@@ -133,13 +126,13 @@ public class ClimateApp implements EntryPoint {
 	}
 
 	private void getMeasurementsAsync() {
-		greetingService.getMeasurements(new AsyncCallback<ArrayList<TemperatureMeasurement>>() {
+		greetingService.getMeasurements(null, 50, new AsyncCallback<MeasurementsQueryResult>() {
 			public void onFailure(Throwable caught) {
 				System.out.println("Failure");
 				Window.alert(caught.getMessage());
 			}
 
-			public void onSuccess(ArrayList<TemperatureMeasurement> result) {
+			public void onSuccess(MeasurementsQueryResult result) {
 				System.out.println("Success");
 				fillTable2(result);
 			}
@@ -147,10 +140,10 @@ public class ClimateApp implements EntryPoint {
 		});
 	}
 
-	private void fillTable2(ArrayList<TemperatureMeasurement> data) {
+	private void fillTable2(MeasurementsQueryResult data) {
 		uiDataTable.updateTable(data);
 		//tempInfoLabel.setText("Table: " + uiDataTable.getRowCount() + " ;  Data: " + data.size());
-		tempInfoLabel.setText(data.size() + "  data records");
+		tempInfoLabel.setText(data.getTotalQueryResultCount() + "  data records returned.");
 	}
 
 }

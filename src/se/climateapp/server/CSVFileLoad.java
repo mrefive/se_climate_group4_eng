@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,32 +57,50 @@ public class CSVFileLoad extends HttpServlet {
 					InputStreamReader streamreader = new InputStreamReader(stream, "UTF-8");
 					BufferedReader br = new BufferedReader(streamreader);
 					DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+					//Transaction txn = datastore.beginTransaction();
+					try {
+						String line;
+						String separator = ",";
+						DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
 
-					String line;
-					String separator = ",";
-					DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-
-					line = br.readLine(); // skip first line
-					line = br.readLine();
-
-					while (line != null) {
-						String[] data = line.split(separator);
-
-						if (data.length != 7) {
-							break;
-						}
-
-						Entity entity = new Entity("TptMeas");
-						entity.setProperty("fd", df.parse(data[0]));
-						entity.setProperty("avgTmp", Double.parseDouble(data[1]));
-						entity.setProperty("avgTmpUn", Double.parseDouble(data[2]));
-						entity.setProperty("City", data[3]);
-						entity.setProperty("Country", data[4]);
-						entity.setProperty("Lat", data[5]);
-						entity.setProperty("Long", data[6]);
+						line = br.readLine(); // skip first line
 						line = br.readLine();
+						int index = 0;
 
-						datastore.put(entity);
+						// load data in batches
+						final int batchSize = 500;
+						while (line != null) {
+							int batchIndex = 0;
+							List<Entity> batchList = new ArrayList<Entity>();
+
+							while (line != null && batchIndex < batchSize) {
+								String[] data = line.split(separator);
+								if (data.length != 7) {
+									line = null;
+									break;
+								}
+
+								Entity entity = new Entity("TptMeas");
+								entity.setProperty("index", index++);
+								entity.setProperty("fd", df.parse(data[0]));
+								entity.setProperty("avgTmp", Double.parseDouble(data[1]));
+								entity.setProperty("avgTmpUn", Double.parseDouble(data[2]));
+								entity.setProperty("City", data[3]);
+								entity.setProperty("Country", data[4]);
+								entity.setProperty("Lat", data[5]);
+								entity.setProperty("Long", data[6]);
+								batchList.add(entity);
+								batchIndex++;
+								line = br.readLine();
+							}
+							datastore.put(batchList);
+							//datastore.put(txn, batchList);
+						}
+						//txn.commit();
+					} finally {
+						//if (txn.isActive()) {
+						//	txn.rollback();
+						//}
 					}
 
 				} catch (Exception e) {
